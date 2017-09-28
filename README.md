@@ -1,5 +1,8 @@
 # Pymod
 
+*Fork of the original [Nim-Pymod](https://github.com/jboy/nim-pymod), which is an awesome project, but does not seem to be maintained anymore.
+For now, this is just an attempt to keep the package working with the latest Nim versions, any help is welcome.*
+
 Auto-generate a [Python](http://www.python.org) module that wraps
 a [Nim programming language](http://nim-lang.org) module.
 
