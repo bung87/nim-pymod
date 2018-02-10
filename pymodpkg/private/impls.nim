@@ -208,7 +208,7 @@ proc verifyBuiltinNimType(nim_type_node: NimNode): TypeFmtTuple
     result = (nim_type, "byte", "int", "B", nil, nil)
   of "char", "cchar":  # a single string character
     result = (nim_type, "cchar", "str [len == 1]", "c", nil, nil)
-  of "string":
+  of "string", "cstring":
     # http://nim-lang.org/system.html#cstring
     result = (nim_type, "cstring", "str", "s", nil, nil)
   else:
