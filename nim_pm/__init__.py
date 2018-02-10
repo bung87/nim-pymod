@@ -1,0 +1,1 @@
+from .pmgen import main as gen

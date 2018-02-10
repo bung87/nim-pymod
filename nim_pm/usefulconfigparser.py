@@ -10,7 +10,7 @@ if sys.version_info.major >= 3:
 else:
     from ConfigParser import RawConfigParser
 
-from .OrderedMultiDict import OrderedMultiDict
+from .orderedmultidict import OrderedMultiDict
 
 
 class UsefulConfigParser(object):

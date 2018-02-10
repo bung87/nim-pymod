@@ -48,7 +48,7 @@ import re
 import subprocess
 import sys
 
-from libpy.UsefulConfigParser import UsefulConfigParser
+from .usefulconfigparser import UsefulConfigParser
 
 
 NIM_COMPILER_EXE_PATH = "nim"
@@ -241,6 +241,8 @@ def generate_nim_cfg_file(pymod_root_dir, python_includes, python_ldflags, numpy
         path = os.path.realpath(path)
         any_other_module_paths.append('path:"%s"' % path)
     #print("nimAddModulePath:", any_other_module_paths)
+    # any_other_module_paths += '\ncincludes: "' + os.path.join( os.path.dirname( __file__ ) ) + '"'
+    # any_other_module_paths.append('path:"%s"' % os.path.join( os.path.dirname( __file__ ) ))
 
     numpy_include_paths = [os.path.join(p, NUMPY_C_INCLUDE_RELPATH) for p in numpy_paths]
     numpy_includes = ["-I" + p for p in numpy_include_paths if os.path.isdir(p)]
@@ -254,6 +256,8 @@ def generate_nim_cfg_file(pymod_root_dir, python_includes, python_ldflags, numpy
     python_cincludes = "\n".join([
             'cincludes:"%s"' % path
             for path in python_includes_uniq])
+
+    python_cincludes += '\ncincludes: "' + os.path.join( os.path.dirname(os.path.dirname( __file__ )) ) + '"'
 
     python_ldflags = " ".join(python_ldflags)
     any_other_module_paths = "\n".join(any_other_module_paths)
