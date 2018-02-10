@@ -58,7 +58,7 @@ macro return_dict*(procDef: expr): stmt =
 macro initPyModule*(modName: string, procNames: varargs[expr]): stmt =
   #let extraIncludes = createStrLitArray()
   #let extraInit = createStrLitArray()
-  let extraIncludes = createStrLitArray("pymodpkg/private/numpyarrayobject.h")
+  let extraIncludes = createStrLitArray("<pymodpkg/private/numpyarrayobject.h>")
   let extraInit = createStrLitArray("import_array();")
   result = initPyModuleImpl(
       pyObjectTypeDefs, procPrototypes, nimModulesToImport,
