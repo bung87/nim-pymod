@@ -1,4 +1,18 @@
-# Pymod
+# Pymod  
+
+This project contains nim package and python package,so you need install both.  
+
+`pip install git+https://github.com/bung87/nim-pymod`  
+`nimble install https://github.com/bung87/nim-pymod`  
+add `requires "https://github.com/bung87/nim-pymod"` to your packagename.nimble  
+
+`pmgen yournimfile.nim`  for generating python bindings.  
+
+This project is a fork version of [apahl](https://github.com/apahl)'s [Nim-Pymod](https://github.com/apahl/nim-pymod)
+
+He fixed the [bug in check for export marker](https://github.com/apahl/nim-pymod/commit/e7043e53c0099291596c3d5e40298db8408d2cb7) which give me a chance to try.
+
+Here is the Forked document belove:  
 
 *Fork of the original [Nim-Pymod](https://github.com/jboy/nim-pymod), which is an awesome project, but does not seem to be maintained anymore.
 For now, this is just an attempt to keep the package working with the latest Nim versions, any help is welcome.*
