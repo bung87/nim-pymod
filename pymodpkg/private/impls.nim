@@ -1371,10 +1371,15 @@ proc initPyModuleImpl*(
   expectArrayOfKind(proc_names_node, nnkSym)
 
   var mod_name: string = $mod_name_node
-  if mod_name.len == 0:
-    # Default to "_%(nim_mod_name)s".
-    mod_name = "_" & mod_name_node.getModuleName
-
+  const PY_MOD_NAME {.strdefine.} = "";
+  when defined(PY_MOD_NAME):
+    mod_name = PY_MOD_NAME
+  else:
+    if mod_name.len == 0:
+      # Default to "_%(nim_mod_name)s".
+      mod_name = "_" & mod_name_node.getModuleName
+  
+  
   #hint("mod name: " & mod_name)
   verifyValidCIdent(mod_name, mod_name_node)
   outputPyModuleC(procPrototypes, mod_name, extra_includes_node, extra_init_node, proc_names_node)

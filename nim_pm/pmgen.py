@@ -47,6 +47,8 @@ import re
 #import shutil
 import subprocess
 import sys
+import argparse
+import textwrap
 
 from .usefulconfigparser import UsefulConfigParser
 
@@ -136,11 +138,26 @@ include pymodpkg/private/includes/pyobjecttypedefs
 # Modules to be included into this Nim code, so their procs can be exportpy'd.
 %(includes)s
 """
-
+def parse_args():
+    parser = argparse.ArgumentParser( prog = 'pmgen',
+                                      formatter_class = argparse.RawDescriptionHelpFormatter,
+                                      description = textwrap.dedent(
+                                      'useage:pmgen nimmodule.nim')
+                                    )
+    parser.add_argument('infiles', nargs="+",type=str)
+    parser.add_argument('--pymod_name', dest="pymod_name", default=None,
+                        metavar="string", action='store', type=str)
+    args, unknown = parser.parse_known_args()
+    return args, unknown
 
 def main():
+    global NIM_SYMBOL_DEFS_CFG
+    args, unknown = parse_args()
+    if args.pymod_name:
+        NIM_SYMBOL_DEFS_CFG+="\ndefine:\"PY_MOD_NAME=%s\"" % args.pymod_name
     pymod_root_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-    (nim_modfiles, nim_modnames) = get_nim_modnames_as_relpaths(sys.argv[1:])
+
+    (nim_modfiles, nim_modnames) = get_nim_modnames_as_relpaths(args.infiles)
     if len(nim_modnames) < 1:
         die("no Nim module names specified")
 

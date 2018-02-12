@@ -5,7 +5,6 @@
 # found in the "LICENSE" file in the root directory of this source tree.
 
 import macros
-
 import pymodpkg/private/astutils
 import pymodpkg/private/impls
 import pymodpkg/private/registrytypes
