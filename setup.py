@@ -6,7 +6,7 @@ import pkg_resources
 
 version = '0.1.0'
 
-install_requires = [
+extras_require = [
     'numpy'
 ]
 
@@ -24,7 +24,7 @@ setup(
             'pmgen=nim_pm:gen'
         ],
     },
-    install_requires=install_requires,
+    extras_require=extras_require,
     classifiers=[
         'Development Status :: 1 - Alpha',
         'License :: OSI Approved :: MIT License',
