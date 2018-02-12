@@ -24,7 +24,7 @@
     * http://nim-lang.org/docs/manual.html#types-not-nil-annotation
     * This will enable compile-time checking to ensure you haven't forgotten to assign a result.
     * Otherwise, the C-API conversion-back-to-Python code receives a NULL pointer, and fails.
-- [ ] Implement the procs planned for implementation in "pymodpkg/pyarrayobject.nim".
+- [x] Implement the procs planned for implementation in "pymodpkg/pyarrayobject.nim".
 - [ ] Enable Python types to be passed from Python into Nim, so we can pass `numpy.int32` as an argument for example.
 - [ ] Implement reading of double-hash comments into docstrings using `nim jsondoc myfile.nim`?
     * http://nim-lang.org/docs/docgen.html#document-types-json
