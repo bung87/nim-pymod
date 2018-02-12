@@ -55,10 +55,16 @@ macro return_dict*(procDef: expr): stmt =
 #
 
 macro initPyModule*(modName: string, procNames: varargs[expr]): stmt =
-  #let extraIncludes = createStrLitArray()
-  #let extraInit = createStrLitArray()
-  let extraIncludes = createStrLitArray("<pymodpkg/private/numpyarrayobject.h>")
-  let extraInit = createStrLitArray("import_array();")
+ 
+  when defined(pyarrayEnabled):
+    let 
+      extraIncludes = createStrLitArray("<pymodpkg/private/numpyarrayobject.h>")
+      extraInit = createStrLitArray("import_array();")
+  else:
+    let 
+      extraIncludes = createStrLitArray()
+      extraInit = createStrLitArray()
+
   result = initPyModuleImpl(
       pyObjectTypeDefs, procPrototypes, nimModulesToImport,
       modName, extraIncludes, extraInit, procNames)
@@ -67,7 +73,7 @@ macro initPyModule*(modName: string, procNames: varargs[expr]): stmt =
 # TODO:  Remove these next two macros entirely, when "pymod-extensions.cfg" is
 # implemented to enable extension/customisation of Pymod extensions.
 
-#macro initPyModuleExtra*(modName: string,
+# macro initPyModuleExtra*(modName: string,
 #    extraIncludes: openarray[string], extraInit: openarray[string],
 #    procNames: varargs[expr]): stmt =
 #  result = initPyModuleImpl(

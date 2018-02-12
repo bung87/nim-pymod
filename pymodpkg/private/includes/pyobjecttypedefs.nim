@@ -10,7 +10,6 @@
 
 definePyObjectType(PyObject, "PyObject",
     "", "Any", ["<Python.h>"])
-
-definePyObjectType(PyArrayObject, "PyArrayObject",
-    "PyArray_Type", "numpy.ndarray", ["<pymodpkg/private/numpyarrayobject.h>"])
-
+when defined(pyarrayEnabled):
+  definePyObjectType(PyArrayObject, "PyArrayObject",
+      "PyArray_Type", "numpy.ndarray", ["<pymodpkg/private/numpyarrayobject.h>"])

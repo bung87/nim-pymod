@@ -1278,7 +1278,8 @@ proc outputPyModuleNim(
   # FIXME:  Ideally, we only want to import `pyarrayobject` if we need to.
   # However, this sin is also made by `definePyObjectType(PyArrayObject,`
   # in "pymod.nim".
-  output_lines << "import pymodpkg/pyarrayobject"
+  when defined(pyarrayEnabled) :
+    output_lines << "import pymodpkg/pyarrayobject"
   for nm in nimModulesToImport:
     output_lines << "import $1" % nm
   output_lines << ""
@@ -1371,9 +1372,9 @@ proc initPyModuleImpl*(
   expectArrayOfKind(proc_names_node, nnkSym)
 
   var mod_name: string = $mod_name_node
-  const PY_MOD_NAME {.strdefine.} = "";
-  when defined(PY_MOD_NAME):
-    mod_name = PY_MOD_NAME
+  const pymodName {.strdefine.} = "";
+  when defined(pymodName):
+    mod_name = pymodName
   else:
     if mod_name.len == 0:
       # Default to "_%(nim_mod_name)s".

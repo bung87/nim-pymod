@@ -64,9 +64,6 @@ NIM_COMPILER_COMMAND = "%s %%s %s" % (NIM_COMPILER_EXE_PATH, " ".join(NIM_COMPIL
 NIM_DEFINED_SYMBOLS_MAKE = "pmgen".split()
 NIM_SYMBOL_DEFS_MAKE = " ".join("--define:%s" % s for s in NIM_DEFINED_SYMBOLS_MAKE)
 
-# For the "nim.cfg".
-NIM_DEFINED_SYMBOLS_CFG = "pymodEnabled pyarrayEnabled".split()
-NIM_SYMBOL_DEFS_CFG = "\n".join("define:\"%s\"" % s for s in NIM_DEFINED_SYMBOLS_CFG)
 
 MAKE_EXE_PATH = "make"
 
@@ -143,16 +140,31 @@ def parse_args():
                                       'useage:pmgen nimmodule.nim')
                                     )
     parser.add_argument('infiles', nargs="+",type=str)
-    parser.add_argument('--pymod_name', dest="pymod_name", default=None,
+    parser.add_argument('--pymodName', dest="pymodName", default=None,
                         metavar="string", action='store', type=str)
+    # parser.add_argument('--numpyEnabled', dest="numpyEnabled", default=False,
+    #                     action='store_true')
+    parser.add_argument('--pyarrayEnabled', dest="pyarrayEnabled", default=False,
+                        action='store_true')
+
     args, unknown = parser.parse_known_args()
     return args, unknown
 
 def main():
-    global NIM_SYMBOL_DEFS_CFG
+    # For the "nim.cfg".
+    nim_defined_symbols_cfg = ["pymodEnabled"]
     args, unknown = parse_args()
-    if args.pymod_name:
-        NIM_SYMBOL_DEFS_CFG+="\ndefine:\"PY_MOD_NAME=%s\"" % args.pymod_name
+    
+    if args.pymodName:
+        nim_defined_symbols_cfg.append("pymodName=%s" % args.pymodName) 
+
+    # if args.numpyEnabled:
+    #     nim_defined_symbols_cfg.append("numpyEnabled") 
+
+    if args.pyarrayEnabled:
+        nim_defined_symbols_cfg.append("pyarrayEnabled") 
+
+    nim_symbol_defs_cfg = "\n".join("define:\"%s\"" % s for s in nim_defined_symbols_cfg)
 
     (nim_modfiles, nim_modnames) = get_nim_modnames_as_relpaths(args.infiles)
     if len(nim_modnames) < 1:
@@ -170,9 +182,9 @@ def main():
 
     (python_includes, python_ldflags) = determine_python_includes_ldflags()
     numpy_paths = test_that_numpy_is_installed()
-    generate_nim_cfg_file( python_includes, python_ldflags, numpy_paths)
+    generate_nim_cfg_file( args,nim_symbol_defs_cfg,python_includes, python_ldflags, numpy_paths)
     pminc_basename = generate_pminc_file(nim_modnames)
-    pmgen_fnames = generate_pmgen_files(nim_modfiles, pminc_basename)
+    pmgen_fnames = generate_pmgen_files(args,nim_modfiles, pminc_basename)
 
     # FIXME:  This approach (of simply globbing by filenames) is highly dodgy.
     # Work out a better way of doing this.
@@ -241,7 +253,7 @@ def get_datestamp():
     return datetime.datetime.now().strftime("%Y-%m-%d at %H:%M:%S")
 
 
-def generate_nim_cfg_file(python_includes, python_ldflags, numpy_paths):
+def generate_nim_cfg_file(args,nim_symbol_defs_cfg,python_includes, python_ldflags, numpy_paths):
     datestamp = get_datestamp()
 
     any_other_module_paths = []
@@ -255,10 +267,11 @@ def generate_nim_cfg_file(python_includes, python_ldflags, numpy_paths):
         path = os.path.realpath(path)
         any_other_module_paths.append('path:"%s"' % path)
     #print("nimAddModulePath:", any_other_module_paths)
-    numpy_include_paths = [os.path.join(p, NUMPY_C_INCLUDE_RELPATH) for p in numpy_paths]
-    numpy_includes = ["-I" + p for p in numpy_include_paths if os.path.isdir(p)]
-    print("Determined Numpy C-API includes\n - includes = %s" % numpy_includes)
-    python_includes.extend(numpy_includes)
+    if args.pyarrayEnabled:
+        numpy_include_paths = [os.path.join(p, NUMPY_C_INCLUDE_RELPATH) for p in numpy_paths]
+        numpy_includes = ["-I" + p for p in numpy_include_paths if os.path.isdir(p)]
+        print("Determined Numpy C-API includes\n - includes = %s" % numpy_includes)
+        python_includes.extend(numpy_includes)
 
     python_includes_uniq = sorted([
             # Remove the leading "-I", if present.
@@ -272,7 +285,7 @@ def generate_nim_cfg_file(python_includes, python_ldflags, numpy_paths):
     pymod_path = subprocess.check_output("nimble path pymod| tail -n 1",shell=True).decode("UTF-8").strip()
     if not os.path.isdir(pymod_path):
         die("Can not find pymodpkg through nimble")
-    
+
     python_cincludes += '\ncincludes: "' + pymod_path + '"'
 
     python_ldflags = " ".join(python_ldflags)
@@ -282,7 +295,7 @@ def generate_nim_cfg_file(python_includes, python_ldflags, numpy_paths):
         f.write(NIM_CFG_CONTENT % dict(
                 datestamp=datestamp,
                 python_cincludes=python_cincludes,
-                nim_symbol_defs=NIM_SYMBOL_DEFS_CFG,
+                nim_symbol_defs=nim_symbol_defs_cfg,
                 python_ldflags=python_ldflags,
                 any_other_module_paths=any_other_module_paths))
 
@@ -324,7 +337,7 @@ def generate_pminc_file(nim_modnames):
     return last_nim_modname_basename
 
 
-def generate_pmgen_files(nim_modfiles, pminc_basename):
+def generate_pmgen_files(args,nim_modfiles, pminc_basename):
     datestamp = get_datestamp()
 
     # Create the Makefile.
