@@ -255,11 +255,6 @@ def generate_nim_cfg_file(python_includes, python_ldflags, numpy_paths):
         path = os.path.realpath(path)
         any_other_module_paths.append('path:"%s"' % path)
     #print("nimAddModulePath:", any_other_module_paths)
-    # any_other_module_paths += '\ncincludes: "' + os.path.join( os.path.dirname( __file__ ) ) + '"'
-    # any_other_module_paths.append('path:"%s"' % os.path.join( os.path.dirname( __file__ ) ))
-    print(numpy_paths)
-
-
     numpy_include_paths = [os.path.join(p, NUMPY_C_INCLUDE_RELPATH) for p in numpy_paths]
     numpy_includes = ["-I" + p for p in numpy_include_paths if os.path.isdir(p)]
     print("Determined Numpy C-API includes\n - includes = %s" % numpy_includes)
@@ -274,7 +269,11 @@ def generate_nim_cfg_file(python_includes, python_ldflags, numpy_paths):
             'cincludes:"%s"' % path
             for path in python_includes_uniq])
 
-    python_cincludes += '\ncincludes: "' + os.path.join( os.path.dirname(os.path.dirname( __file__ )) ) + '"'
+    pymod_path = subprocess.check_output("nimble path pymod| tail -n 1",shell=True).decode("UTF-8").strip()
+    if not os.path.isdir(pymod_path):
+        die("Can not find pymodpkg through nimble")
+    
+    python_cincludes += '\ncincludes: "' + pymod_path + '"'
 
     python_ldflags = " ".join(python_ldflags)
     any_other_module_paths = "\n".join(any_other_module_paths)
@@ -282,7 +281,6 @@ def generate_nim_cfg_file(python_includes, python_ldflags, numpy_paths):
     with open(NIM_CFG_FNAME, "w") as f:
         f.write(NIM_CFG_CONTENT % dict(
                 datestamp=datestamp,
-                # pymod_root_dir=pymod_root_dir,
                 python_cincludes=python_cincludes,
                 nim_symbol_defs=NIM_SYMBOL_DEFS_CFG,
                 python_ldflags=python_ldflags,

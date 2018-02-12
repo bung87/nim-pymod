@@ -17,9 +17,8 @@ setup(
     description='',
     license='MIT',
     url='https://github.com/bung87/nim-pymod',
-    packages=["nim_pm","pymodpkg"],
-    package_dir={'nim_pm': 'nim_pm',"pymodpkg":"pymodpkg"},
-    include_package_data=True,
+    packages=["nim_pm"],
+    package_dir={'nim_pm': 'nim_pm'},
     entry_points={
         'console_scripts': [
             'pmgen=nim_pm:gen'
