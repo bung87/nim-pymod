@@ -6,7 +6,7 @@ This project contains nim package and python package,so you need install both.
 `nimble install https://github.com/bung87/nim-pymod`  
 add `requires "https://github.com/bung87/nim-pymod"` to your packagename.nimble  
 
-`pmgen yournimfile.nim`  for generating python bindings.  
+`pmgen --release --pymodName yourcutomname  yournimfile.nim `  for generating python bindings.  
 
 This project is a fork version of [apahl](https://github.com/apahl)'s [Nim-Pymod](https://github.com/apahl/nim-pymod)
 
