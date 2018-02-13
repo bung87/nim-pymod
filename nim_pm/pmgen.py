@@ -147,6 +147,9 @@ def parse_args():
     parser.add_argument('--pyarrayEnabled', dest="pyarrayEnabled", default=False,
                         action='store_true')
 
+    parser.add_argument('--release', dest="release", default=False,
+                        action='store_true')
+
     args, unknown = parser.parse_known_args()
     return args, unknown
 
@@ -173,7 +176,7 @@ def main():
     global CONFIG
     CONFIG = readPymodConfig()
     global NIM_COMPILER_COMMAND
-    NIM_COMPILER_COMMAND = getCompilerCommand()
+    NIM_COMPILER_COMMAND = getCompilerCommand(args)
 
     orig_dir = os.getcwd()
     if not (os.path.exists(PMGEN_DIRNAME) and os.path.isdir(PMGEN_DIRNAME)):
@@ -205,9 +208,9 @@ def main():
     os.chdir(orig_dir)
 
 
-def getCompilerCommand():
+def getCompilerCommand(args):
     nim_compiler_flags = NIM_COMPILER_FLAGS[:]
-    if any(CONFIG.getboolean("all", "nimSetIsRelease")):
+    if  args.release or any(CONFIG.getboolean("all", "nimSetIsRelease")):
         nim_compiler_flags.extend(NIM_COMPILER_FLAG_OPTIONS["nimSetIsRelease"])
         #print("nimSetIsRelease: True")
 
