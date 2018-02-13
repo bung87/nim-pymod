@@ -6,9 +6,9 @@ import pkg_resources
 
 version = '0.1.0'
 
-extras_require = [
-    'numpy'
-]
+extras_require = {
+    "numpy": ["numpy >= 1.11.0"]
+}
 
 
 setup(
