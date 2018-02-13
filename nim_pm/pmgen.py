@@ -183,7 +183,8 @@ def main():
     (python_includes, python_ldflags) = determine_python_includes_ldflags()
     numpy_paths = test_that_numpy_is_installed()
     generate_nim_cfg_file( args,nim_symbol_defs_cfg,python_includes, python_ldflags, numpy_paths)
-    pminc_basename = generate_pminc_file(nim_modnames)
+    pminc_basename = generate_pminc_file(args,nim_modnames)
+
     pmgen_fnames = generate_pmgen_files(args,nim_modfiles, pminc_basename)
 
     # FIXME:  This approach (of simply globbing by filenames) is highly dodgy.
@@ -194,6 +195,7 @@ def main():
 
     pymodule_fnames = extract_pymodule_fnames_from_glob(nim_wrapper_fnames,
             nim_wrapper_glob)
+
     python_exe_name = sys.executable
     compile_generated_nim_wrappers(nim_wrapper_fnames, pymodule_fnames,
             nim_modfiles, pminc_basename, python_exe_name)
@@ -314,7 +316,7 @@ def dotdot(relpath):
     return os.path.join("..", relpath)
 
 
-def generate_pminc_file(nim_modnames):
+def generate_pminc_file(args,nim_modnames):
     datestamp = get_datestamp()
 
     # We need to "dot-dot" one level, because we are in the "pmgen" subdir.
@@ -323,7 +325,8 @@ def generate_pminc_file(nim_modnames):
             for modname in nim_modnames]
     includes = ["include %s" % modname for modname in nim_modnames]
 
-    last_nim_modname_basename = os.path.basename(nim_modnames[-1])
+    last_nim_modname_basename = args.pymodName if args.pymodName else os.path.basename(nim_modnames[-1])
+
     pminc_fname = PMINC_FNAME_TEMPLATE % dict(
             modname_basename=last_nim_modname_basename,
             pmgen_prefix=PMGEN_PREFIX)
@@ -348,6 +351,7 @@ def generate_pmgen_files(args,nim_modfiles, pminc_basename):
     # We need to "dot-dot" one level, because we are in the "pmgen" subdir.
     nim_modfiles = [dotdot(modfname) for modfname in nim_modfiles]
     prereqs = [pminc_fname] + nim_modfiles
+
     compile_rule = "%s: %s\n\t%s $(PMGEN) %s" % \
             (rule_target, " ".join(prereqs), NIM_COMPILER_COMMAND % "compile", pminc_fname)
 
