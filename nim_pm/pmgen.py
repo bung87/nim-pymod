@@ -188,7 +188,7 @@ def main():
     generate_nim_cfg_file( args,nim_symbol_defs_cfg,python_includes, python_ldflags, numpy_paths)
     pminc_basename = generate_pminc_file(args,nim_modnames)
 
-    pmgen_fnames = generate_pmgen_files(args,nim_modfiles, pminc_basename)
+    generate_pmgen_files(args,nim_modfiles, pminc_basename)
 
     # FIXME:  This approach (of simply globbing by filenames) is highly dodgy.
     # Work out a better way of doing this.
